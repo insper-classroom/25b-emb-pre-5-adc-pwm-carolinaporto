@@ -24,44 +24,39 @@ void data_task(void *p) {
 }
 
 static int ma5_push(int x, int *y_out) {
-    static int buf[5] = {0};
-    static int idx = 0;
-    static int count = 0;
-    static int sum = 0;
+    int buf[5] = {0};
+    int idx = 0;
+    int count = 0; 
+    int sum = 0;
+
+    sum -= buf[idx];
+    sum += x;
+
+    buf[idx] = x;
+    idx = (idx + 1) % 5;
 
     if (count < 5) {
-        sum += x;
-        buf[idx] = x;
-        idx = (idx + 1) % 5;
         count++;
-        if (count == 5) {
-            *y_out = sum / 5;
-            return 1;
-        }
         return 0;
-    } else {
-        int x_old = buf[idx];
-        sum -= x_old;
-        sum += x;
-        buf[idx] = x;
-        idx = (idx + 1) % 5;
-
-        *y_out = sum / 5;
-        return 1;
     }
+
+    *y_out = sum / 5;
+    return 1;
 }
 
 void process_task(void *p) {
     int data = 0;
-
+    int y = 0;
+    
     while (true) {
         if (xQueueReceive(xQueueData, &data, 100)) {
-
-            int y;
+            // implementar filtro aqui!
+            
             if (ma5_push(data, &y)) {
                 printf("%d \n", y);
             }
 
+            // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));
         }
     }

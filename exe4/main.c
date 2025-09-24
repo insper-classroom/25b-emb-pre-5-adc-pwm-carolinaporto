@@ -68,25 +68,23 @@ int main() {
     arm_next_alarm();
 
     while (true) {
-        if (!timer_fired) {
-            tight_loop_contents();
-            continue;
+        if (timer_fired) {
+            timer_fired = false;
+
+            raw = adc_read();
+            v = raw * conv;
+            next_period_ms = timer_ms(v);
+
+            if (!blinking_enabled || next_period_ms == 0) {
+                led_on = false;
+                gpio_put(LED_PIN, 0);
+            } else {
+                led_on = !led_on;
+                gpio_put(LED_PIN, led_on ? 1 : 0);
+            }
+
+            arm_next_alarm();
         }
-        timer_fired = false;
-
-        raw = adc_read();
-        v = raw * conv;
-        next_period_ms = timer_ms(v);
-
-        if (!blinking_enabled || next_period_ms == 0) {
-            led_on = false;
-            gpio_put(LED_PIN, 0);
-        } else {
-            led_on = !led_on;
-            gpio_put(LED_PIN, led_on ? 1 : 0);
-        }
-
-        arm_next_alarm();
     }
     return 0;
 }
