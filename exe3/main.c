@@ -24,10 +24,10 @@ void data_task(void *p) {
 }
 
 static int ma5_push(int x, int *y_out) {
-    int buf[5] = {0};
-    int idx = 0;
-    int count = 0; 
-    int sum = 0;
+    static int buf[5]  = {0};
+    static int idx     = 0;
+    static int count   = 0;
+    static int sum     = 0;
 
     sum -= buf[idx];
     sum += x;
@@ -35,10 +35,7 @@ static int ma5_push(int x, int *y_out) {
     buf[idx] = x;
     idx = (idx + 1) % 5;
 
-    if (count < 5) {
-        count++;
-        return 0;
-    }
+    if (count < 5) count++;
 
     *y_out = sum / 5;
     return 1;
